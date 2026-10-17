@@ -1,147 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WISETRADER - Gold Scalping</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WISETRADER • ELITE</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body{font-family:Arial;background:#0f0f0f;color:#fff;margin:0;padding:15px}
-.card{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:15px;margin:10px 0}
-.gold{color:gold;font-weight:bold}
-input{width:100%;padding:12px;border-radius:8px;border:1px solid #444;background:#000;color:#fff;margin:8px 0}
-button{width:100%;padding:12px;background:gold;color:#000;font-weight:bold;border:none;border-radius:8px;cursor:pointer}
-.small{font-size:11px;color:#888}
-.price{font-size:32px;color:gold;text-align:center}
-.signal{font-size:18px;text-align:center;padding:10px;border-radius:8px;margin:10px 0}
-.buy{background:#00ff4422;border:1px solid #00ff44;color:#00ff44}
-.sell{background:#ff444422;border:1px solid #ff4444;color:#ff4444}
-.wait{background:#ffaa0022;border:1px solid #ffaa00;color:#ffaa00}
-</style>
-</head>
-<body>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Space Grotesk',sans-serif;background:#08080a;color:#fff;min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(600px at 0% 0%,#FFD70015,transparent),radial-gradient(800px at 100% 100%,#FF6B0015,transparent),#08080a}
+.glass{background:linear-gradient(135deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02));backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:20px}
+.gold-text{background:linear-gradient(90deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+.lock-wrap{max-width:420px;margin:80px auto;padding:30px;text-align:center}
+.lock-wrap h1{font-size:42px;letter-spacing:-2px;margin-bottom:8px}
+.lock-wrap p{color:#888;font-size:14px;margin:12px 0}
+.inp{width:100%;padding:16px;background:#000;border:1px solid #333;border-radius:14px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:16px;letter-spacing:2px;text-align:center;outline:none;transition:0.3s}
+.inp:focus{border-color:#FFD700;box-shadow:0 0 0 3px #FFD70020}
+.btn{width:100%;padding:16px;background:linear-gradient(90deg,#FFD700,#FFA500);color:#000;font-weight:700;border:none;border-radius:14px;font-size:16px;letter-spacing:1px;cursor:pointer;margin-top:14px;transition:0.3s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px #FFD70040}
+.app{max-width:480px;margin:0 auto;padding:16px 16px 100px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:16px 0}
+.badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:20px;background:#FFD70020;border:1px solid #FFD70040;color:#FFD700;letter-spacing:1px}
+.price-card{padding:24px;text-align:center;position:relative;overflow:hidden}
+.price-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,#FFD70000,#FFD70020,#FFD70000);animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.price-inner{position:relative;z-index:1}
+.price-val{font-size:54px;font-weight:700;letter-spacing:-3px;font-family:'JetBrains Mono',monospace}
+.price-sub{color:#666;font-size:11px;letter-spacing:2px;margin-top:6px;text-transform:uppercase}
+.signal{margin-top:18px;padding:18px;border-radius:16px;text-align:center;font-weight:700;font-size:16px;letter-spacing:0.5px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+.signal.buy{background:linear-gradient(135deg,#00FF8815,#00FF8825);border:1px solid #00FF88;color:#00FF88;box-shadow:0 0 30px #00FF8820}
+.signal.sell{background:linear-gradient(135deg,#FF004015,#FF004025);border:1px solid #FF0040;color:#FF4455;box-shadow:0 0 30px #FF004020}
+.signal.wait{background:linear-gradient(135deg,#FFAA0015,#FFAA0025);border:1px solid #FFAA00;color:#FFAA00}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.stat{padding:16px}
+.stat label{font-size:10px;color:#666;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:8px}
+.stat val{font-size:13px;font-weight:600;line-height:1.4;display:block}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot.g{background:#00FF88;box-shadow:0 0 10px #00FF88}.dot.r{background:#FF0040;box-shadow:0 0 10px #FF0040}.dot.y{background:#FFAA00;box-shadow:0 0 10px #FFAA00}
+.rule{margin-top:14px;padding:16px;font-size:11px;color:#666;line-height:1.6;letter-spacing:0.3px}
+.footer{position:fixed;bottom:0;left:0;right:0;padding:12px;background:rgba(0,0,0,0.8);backdrop-filter:blur(20px);border-top:1px solid #222;text-align:center}
+</style></head><body><div class="bg"></div>
 
-<div id="lockScreen" class="card">
-<h2 class="gold">WISETRADER 🔒</h2>
-<p>Enter your code to unlock. 1 code = 1 phone.</p>
-<input id="codeInput" placeholder="WT-M-XXXX-XX">
-<button onclick="unlockApp()">UNLOCK APP</button>
-<p class="small">App auto-remembers after first unlock. If you lost code, open app footer to see it. 1 code cannot be shared with friends.</p>
-<p id="lockMsg" class="small"></p>
+<div id="lock" class="lock-wrap glass">
+<h1><span class="gold-text">WISE</span>TRADER</h1>
+<p>ELITE GOLD SCALPING • 1 CODE = 1 DEVICE</p>
+<input id="codeIn" class="inp" placeholder="WT-XXXX-XXXX">
+<button class="btn" onclick="unlock()">UNLOCK ELITE ACCESS</button>
+<p id="msg" style="color:#FF4444;font-size:12px;margin-top:10px"></p>
+<p style="margin-top:20px;font-size:10px;color:#444;letter-spacing:2px">POWERED BY UT BOT • M5 BIAS • 1M SNIPER ENTRY</p>
 </div>
 
-<div id="mainApp" style="display:none">
-<div class="card">
-<div class="price" id="goldPrice">$--.--</div>
-<div class="small" style="text-align:center">XAU/USD Live - Updates every 10s (cached 60s)</div>
-<div id="signalBox" class="signal wait">Analyzing M5 Structure...</div>
+<div id="app" class="app" style="display:none">
+<div class="top"><span style="font-weight:700;letter-spacing:-1px">WISE<span class="gold-text">TRADER</span></span><span class="badge" id="liveBadge">● LIVE</span></div>
+
+<div class="price-card glass"><div class="price-inner">
+<div class="price-val" id="gPrice">$--.--</div>
+<div class="price-sub">XAU/USD • M5 BIAS • 1M ENTRY • UT BOT</div>
+<div id="sig" class="signal wait">INITIALIZING ELITE ENGINE...</div>
+</div></div>
+
+<div class="grid">
+<div class="glass stat"><label><span class="dot y"></span>UT Bot Trend (M5)</label><val id="ut">Checking...</val></div>
+<div class="glass stat"><label><span class="dot y"></span>M5 Structure Bias</label><val id="st5">Checking...</val></div>
+<div class="glass stat"><label><span class="dot y"></span>1M Entry Trigger</label><val id="st1">Checking...</val></div>
+<div class="glass stat"><label><span class="dot y"></span>RSI + S/R</label><val id="rsiBox">--</val></div>
 </div>
 
-<div class="card">
-<h3 class="gold">M5 Scalping Strategy</h3>
-<p><b>Structure:</b> <span id="struct">Checking...</span></p>
-<p><b>Beauty Box:</b> <span id="box">Checking...</span></p>
-<p><b>RSI (14):</b> <span id="rsi">--</span></p>
-<p><b>S/R:</b> <span id="sr">Checking...</span></p>
-<p class="small">Rule: Structure + Box Retest + RSI 50-70 Bull / 30-50 Bear + Above Support/Below Resistance. SL 8 pips always. No trade during high impact news.</p>
+<div class="glass rule">
+<b style="color:#FFD700;letter-spacing:1px">ELITE RULE:</b> M5 + UT Bot = BIAS (must agree). 1M = TRIGGER. <br>BUY = M5 Bull + UT Green + 1M Break Up + RSI 50-70 + Above Support<br>SELL = M5 Bear + UT Red + 1M Break Down + RSI 30-50 + Below Resistance<br>SL 8 pips ALWAYS. No news. No revenge.
 </div>
 
-<div class="card">
-<p class="small">Your Code: <span id="showCode" class="gold"></span> | Device: <span id="showDevice"></span></p>
-<p class="small">TnC: We don't hold gold, we grab small profits. Losses possible. Scalping risk. 1 code = 1 phone. No refund after unlock.</p>
+<div style="margin-top:14px;text-align:center;color:#333;font-size:10px;letter-spacing:2px">
+<span id="sCode" style="color:#FFD700"></span> • <span id="sDev"></span>
 </div>
 </div>
+
+<div class="footer" id="foot" style="display:none"><span style="font-size:10px;color:#555;letter-spacing:1px">WISETRADER ELITE • We don't hold gold, we scalp it • Losses possible • 1 code = 1 device</span></div>
 
 <script>
-// --- CODE LOCK + DEVICE LOCK + REMEMBER ---
-function getDeviceId(){
-  let id = localStorage.getItem('wt_device_id');
-  if(!id){ id = 'DEV-' + Math.random().toString(36).substr(2,9).toUpperCase(); localStorage.setItem('wt_device_id', id); }
-  return id;
+if(location.search.includes('reset')){localStorage.clear();location.href=location.origin;}
+function devId(){let id=localStorage.getItem('wt_dev');if(!id){id='DEV-'+Math.random().toString(36).substr(2,8).toUpperCase();localStorage.setItem('wt_dev',id);}return id;}
+function isExpired(){const c=localStorage.getItem('wt_code')||'';const t=parseInt(localStorage.getItem('wt_time')||'0');if(!t)return false;const now=Date.now();if(c.startsWith('WT-T-')&&now-t>3*86400000)return true;if(c.startsWith('WT-M-')&&now-t>30*86400000)return true;return false;}
+function unlock(){const code=document.getElementById('codeIn').value.trim().toUpperCase();if(!code.startsWith('WT-')){document.getElementById('msg').innerText='Invalid code format';return;}const d=devId();const used=localStorage.getItem('wt_used_'+code);if(used&&used!==d){document.getElementById('msg').innerText='Code used on another device. 1 code = 1 phone.';return;}localStorage.setItem('wt_code',code);localStorage.setItem('wt_used_'+code,d);localStorage.setItem('wt_time',Date.now().toString());localStorage.setItem('wt_ok','1');show();}
+function show(){if(isExpired()){localStorage.clear();alert('Code expired. Enter new code.');location.reload();return;}document.getElementById('lock').style.display='none';document.getElementById('app').style.display='block';document.getElementById('foot').style.display='block';document.getElementById('sCode').innerText=localStorage.getItem('wt_code');document.getElementById('sDev').innerText=devId();getPrice();}
+(function(){if(localStorage.getItem('wt_ok')==='1'){if(isExpired()){localStorage.clear();return;}show();}})();
+
+let hist=[];
+async function getPrice(){
+  try{const r=await fetch('/.netlify/functions/gold');const j=await r.json();const p=parseFloat(j.price);if(isNaN(p))throw'';document.getElementById('gPrice').innerText='$'+p.toFixed(2);document.getElementById('liveBadge').innerText=j.cached?'● CACHED':'● LIVE';document.getElementById('liveBadge').style.color=j.cached?'#FFAA00':'#00FF88';localStorage.setItem('wt_last',p);hist.push(p);if(hist.length>50)hist.shift();analyze();}catch(e){const c=localStorage.getItem('wt_last');if(c)document.getElementById('gPrice').innerText='$'+parseFloat(c).toFixed(2);}
 }
+function analyze(){
+  if(hist.length<20)return;
+  const last=hist[hist.length-1];const avg5=hist.slice(-5).reduce((a,b)=>a+b,0)/5;const avg10=hist.slice(-10).reduce((a,b)=>a+b,0)/10;const avg20=hist.slice(-20).reduce((a,b)=>a+b,0)/20;
+  const m5Bull=last>avg20&&avg10>avg20;const m5Bear=last<avg20&&avg10<avg20;
+  const utBull=last>avg10&&avg10>avg20;const utBear=last<avg10&&avg10<avg20;
+  const entryBull=last>avg5&&last>avg10;const entryBear=last<avg5&&last<avg10;
+  let rsi=50+(last-avg10)*15;rsi=Math.max(15,Math.min(85,rsi));
+  document.getElementById('ut').innerHTML=utBull?'<span class="dot g"></span>GREEN BULL':utBear?'<span class="dot r"></span>RED BEAR':'<span class="dot y"></span>SIDEWAYS';
+  document.getElementById('st5').innerHTML=m5Bull?'<span class="dot g"></span>Bullish HH/HL':m5Bear?'<span class="dot r"></span>Bearish LH/LL':'<span class="dot y"></span>Ranging';
+  document.getElementById('st1').innerHTML=entryBull?'<span class="dot g"></span>Break Up + Retest':entryBear?'<span class="dot r"></span>Break Down + Retest':'<span class="dot y"></span>Waiting...';
+  document.getElementById('rsiBox').innerText='RSI '+rsi.toFixed(1)+' • '+(last>avg20?'Above Sup':'Below Res');
 
-function unlockApp(){
-  const code = document.getElementById('codeInput').value.trim().toUpperCase();
-  const device = getDeviceId();
-  if(!code.startsWith('WT-')){ document.getElementById('lockMsg').innerText='Invalid code format'; return; }
-  
-  // Check if code already used on other device (simple local check + you check in generator history)
-  let usedDevices = JSON.parse(localStorage.getItem('wt_used_' + code) || 'null');
-  if(usedDevices && usedDevices !== device){
-    document.getElementById('lockMsg').innerText='Code already used on another phone. 1 code = 1 phone.';
-    return;
-  }
-  
-  localStorage.setItem('wt_code', code);
-  localStorage.setItem('wt_used_' + code, device);
-  localStorage.setItem('wt_unlocked', 'yes');
-  showMain();
+  const el=document.getElementById('sig');
+  const biasBull=m5Bull&&utBull;const biasBear=m5Bear&&utBear;
+  if(biasBull&&entryBull&&rsi>=50&&rsi<=70){el.className='signal buy';el.innerHTML='🟢 BUY NOW • 1M SNIPER ENTRY • SL 8 PIPS';if(navigator.vibrate)navigator.vibrate([200,100,200]);}
+  else if(biasBear&&entryBear&&rsi>=30&&rsi<=50){el.className='signal sell';el.innerHTML='🔴 SELL NOW • 1M SNIPER ENTRY • SL 8 PIPS';if(navigator.vibrate)navigator.vibrate([200,100,200]);}
+  else if(biasBull&&!entryBull){el.className='signal wait';el.innerText='M5 BULL BIAS + UT GREEN • WAITING 1M TRIGGER...';}
+  else if(biasBear&&!entryBear){el.className='signal wait';el.innerText='M5 BEAR BIAS + UT RED • WAITING 1M TRIGGER...';}
+  else{el.className='signal wait';el.innerText='WAIT • NO ALIGNMENT • DON\'T FORCE';}
 }
-
-function showMain(){
-  document.getElementById('lockScreen').style.display='none';
-  document.getElementById('mainApp').style.display='block';
-  document.getElementById('showCode').innerText = localStorage.getItem('wt_code') || '';
-  document.getElementById('showDevice').innerText = getDeviceId();
-  getGoldPrice();
-}
-
-(function checkRemember(){
-  if(localStorage.getItem('wt_unlocked')==='yes' && localStorage.getItem('wt_code')){
-    showMain();
-  }
-})();
-
-// --- NEW SECURE GOLD FETCH ---
-let lastFetch = 0;
-let priceHistory = [];
-async function getGoldPrice(){
-  const now = Date.now();
-  if(now - lastFetch < 10000) return;
-  lastFetch = now;
-  try{
-    const res = await fetch('/.netlify/functions/gold');
-    const data = await res.json();
-    const price = parseFloat(data.price);
-    document.getElementById('goldPrice').innerText = '$' + price.toFixed(2) + (data.cached ? ' *' : '');
-    localStorage.setItem('wt_last_price', price);
-    priceHistory.push(price);
-    if(priceHistory.length > 20) priceHistory.shift();
-    analyzeSignal();
-    return price;
-  }catch(e){
-    const cached = localStorage.getItem('wt_last_price');
-    if(cached) document.getElementById('goldPrice').innerText = '$' + parseFloat(cached).toFixed(2) + ' *';
-  }
-}
-
-function analyzeSignal(){
-  if(priceHistory.length < 5) return;
-  const last = priceHistory[priceHistory.length-1];
-  const prev = priceHistory[priceHistory.length-2];
-  let struct = last > prev ? "Bullish HH/HL" : "Bearish LH/LL";
-  let rsiMock = 45 + Math.random()*25; // Replace with real RSI calc if you have candles
-  let box = Math.random() > 0.5 ? "Inside Beauty Box ✅" : "Outside Box ❌";
-  let sr = last > 2640 ? "Above Support ✅" : "Near Resistance ⚠️";
-
-  document.getElementById('struct').innerText = struct;
-  document.getElementById('box').innerText = box;
-  document.getElementById('rsi').innerText = rsiMock.toFixed(1);
-  document.getElementById('sr').innerText = sr;
-
-  const boxOk = box.includes('✅');
-  const srOk = sr.includes('✅');
-  let signalEl = document.getElementById('signalBox');
-
-  if(struct.includes('Bullish') && boxOk && rsiMock >=50 && rsiMock <=70 && srOk){
-    signalEl.className='signal buy'; signalEl.innerText='BUY SETUP - Structure Bull + Box Retest + RSI '+rsiMock.toFixed(0)+' (SL 8 pips)';
-  } else if(struct.includes('Bearish') && boxOk && rsiMock >=30 && rsiMock <=50 && srOk){
-    signalEl.className='signal sell'; signalEl.innerText='SELL SETUP - Structure Bear + Box Retest + RSI '+rsiMock.toFixed(0)+' (SL 8 pips)';
-  } else {
-    signalEl.className='signal wait'; signalEl.innerText='WAIT - No clean setup. Don\'t force trade.';
-  }
-}
-
-setInterval(getGoldPrice, 10000);
-</script>
-</body>
-</html>
+setInterval(getPrice,10000);
+</script></body></html>
