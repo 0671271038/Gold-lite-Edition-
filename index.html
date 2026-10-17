@@ -15,6 +15,7 @@ h1{font-size:25px;font-weight:700}h1 span{font-weight:400;color:#D4B86A;font-sty
 .chk a{color:#D4B86A;text-decoration:underline}
 .btn{width:100%;background:linear-gradient(180deg,#FFE066,#C9A227);color:#000;font-weight:700;border:none;border-radius:14px;padding:15px;font-size:13px;cursor:pointer}
 .btn2{width:100%;background:#222;border:1px solid #333;color:#aaa;border-radius:12px;padding:10px;font-size:11px;margin-top:8px;cursor:pointer}
+.btnLogout{background:#ff003318;border:1px solid #ff4444;color:#ff6666;border-radius:10px;padding:6px 12px;font-size:10px;cursor:pointer}
 .wabox{margin-top:14px;background:#1e1e22;border-radius:14px;padding:12px;font-size:12px}
 .foot{margin-top:14px;font-size:9px;color:#555}
 .msg{color:#ff6b6b;font-size:11px;margin-top:8px;min-height:14px}
@@ -39,13 +40,17 @@ h1{font-size:25px;font-weight:700}h1 span{font-weight:400;color:#D4B86A;font-sty
 <button class="btn" onclick="unlock()">UNLOCK APP</button>
 <button class="btn2" onclick="location.reload()">REFRESH</button>
 <div id="msg" class="msg"></div>
-<div class="wabox"><b>Get Code on WhatsApp</b><br>Owner: 067 127 1038<br><small style="color:#777">ELITE Private Build</small></div>
+<div class="wabox"><b>Get Code on WhatsApp</b><br>Owner: 067 127 1038</div>
 <div class="foot">WISETRADER ELITE • R100K PRIVATE BUILD</div>
 </div>
 
 <div id="app" style="display:none">
-<div class="topbar"><span style="font-size:13px"><b>WISETRADER</b> <i style="color:#D4B86A">GOLD PRO</i></span><span class="timer" id="countdown">--</span></div>
+<div class="topbar">
+<span style="font-size:13px"><b>WISETRADER</b> <i style="color:#D4B86A">GOLD PRO</i></span>
+<button class="btnLogout" onclick="logout()">LOGOUT</button>
+</div>
 <div class="card" style="padding:20px">
+<div style="text-align:center"><span class="timer" id="countdown">--</span></div>
 <div id="gPrice" class="price">$--.--</div>
 <div style="text-align:center;font-size:10px;color:#666;margin-bottom:8px"><span id="liveDot">●</span> MT5 REAL • <span id="lastUp">--</span></div>
 <div id="sig" class="signal wait">SYNCING MT5...</div>
@@ -55,21 +60,28 @@ h1{font-size:25px;font-weight:700}h1 span{font-weight:400;color:#D4B86A;font-sty
 <div class="box"><label>1M ENTRY</label><div id="st1">Sync...</div></div>
 <div class="box"><label>RSI + ATR</label><div id="rsiBox">--</div></div>
 </div>
-<button class="btn2" onclick="hardRefresh()">↻ REFRESH DATA (IF STUCK)</button>
+<button class="btn2" onclick="getData()">↻ REFRESH DATA (IF STUCK)</button>
+<button class="btn2" onclick="logout()" style="color:#ff6666;border-color:#ff4444">LOGOUT & ENTER CODE AGAIN</button>
 <div style="margin-top:10px;font-size:9px;color:#555;text-align:center">Code: <span id="sCode" style="color:#D4B86A"></span><br><span id="expInfo"></span></div>
 </div>
 </div>
 
-<div id="tncModal" class="modal" onclick="closeTnc()"><div class="inner" onclick="event.stopPropagation()"><h3>Terms and Conditions</h3>
-1. For educational analysis only.<br>2. Gold trading high risk.<br>3. 1 Code = 1 Phone.<br>4. No refunds after activation.<br>5. Past performance not guarantee future.<br>6. Owner not liable for losses.<br>7. Always use stop loss.<br>8. No trading during high-impact news.<br>9. You accept full responsibility.<br><br><button class="btn" onclick="closeTnc()">I UNDERSTAND</button></div></div>
+<div id="tncModal" class="modal" onclick="closeTnc()"><div class="inner" onclick="event.stopPropagation()"><h3>TnCs</h3>1. Educational only.<br>2. High risk.<br>3. 1 Code=1 Phone.<br>4. No refunds.<br>5. Past not future.<br>6. Not liable.<br>7. Use SL.<br>8. No news trading.<br>9. Full responsibility.<br><br><button class="btn" onclick="closeTnc()">I UNDERSTAND</button></div></div>
 
 <script>
 function openTnc(){document.getElementById('tncModal').style.display='block'}
 function closeTnc(){document.getElementById('tncModal').style.display='none'; document.getElementById('tncCheck').checked=true}
-function hardRefresh(){location.reload();}
-if(location.search.includes('reset')){localStorage.clear();location.href=location.origin;}
+function logout(){
+  // FULL CLEAR - fresh start
+  localStorage.removeItem('wt_ok');
+  localStorage.removeItem('wt_code');
+  localStorage.removeItem('wt_time');
+  localStorage.removeItem('wt_last');
+  // keep device id but clear code binding? No, clear all wt_used for fresh
+  location.href=location.origin+location.pathname;
+}
+if(location.search.includes('reset')){localStorage.clear();location.href=location.origin+location.pathname;}
 function devId(){let id=localStorage.getItem('wt_dev');if(!id){id='DEV-'+Math.random().toString(36).substr(2,6).toUpperCase();localStorage.setItem('wt_dev',id);}return id;}
-
 function getExpiry(code,start){
   if(code==='W-7843'||code==='W-9643') return Infinity;
   if(code.startsWith('TRIAL-')) return start+3*86400000;
@@ -100,15 +112,13 @@ function startTimer(){
   function tick(){
     if(exp===Infinity){el.innerText='LIFETIME ACTIVE'; info.innerText='Lifetime • No Expiry'; return;}
     const diff=exp-Date.now();
-    if(diff<=0){localStorage.clear(); alert('Code expired. Contact owner.'); location.reload(); return;}
+    if(diff<=0){alert('Code expired. Contact owner.'); logout(); return;}
     const d=Math.floor(diff/86400000); const h=Math.floor((diff%86400000)/3600000); const m=Math.floor((diff%3600000)/60000); const s=Math.floor((diff%60000)/1000);
-    el.innerText=`${d}d ${h}h ${m}m ${s}s`;
-    info.innerText=`Expires in ${d}d ${h}h ${m}m`;
+    el.innerText=`${d}d ${h}h ${m}m ${s}s`; info.innerText=`Expires in ${d}d ${h}h ${m}m`;
   }
   tick(); setInterval(tick,1000);
 }
-if(localStorage.getItem('wt_ok')==='1'){const c=localStorage.getItem('wt_code'); const s=parseInt(localStorage.getItem('wt_time')||'0'); if(Date.now()>getExpiry(c,s)&&getExpiry(c,s)!==Infinity){localStorage.clear();} else show();}
-
+if(localStorage.getItem('wt_ok')==='1'){const c=localStorage.getItem('wt_code'); const s=parseInt(localStorage.getItem('wt_time')||'0'); if(Date.now()>getExpiry(c,s)&&getExpiry(c,s)!==Infinity){logout();} else show();}
 function calcATR(candles,period=10){
   let trs=[]; for(let i=1;i<candles.length;i++){const h=parseFloat(candles[i].high), l=parseFloat(candles[i].low), pc=parseFloat(candles[i-1].close); trs.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)));}
   const slice=trs.slice(-period); return slice.reduce((a,b)=>a+b,0)/slice.length;
