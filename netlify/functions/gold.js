@@ -1,31 +1,83 @@
-let cache={price:"2665.42",m5:[],m1:[],t:0};
-exports.handler=async()=>{
-  const now=Date.now();
-  if(cache.t && (now-cache.t<15000) && cache.price){
-    return {statusCode:200,headers:{"Access-Control-Allow-Origin":"*","Content-Type":"application/json"},body:JSON.stringify(cache)};
-  }
-  const k="00dbc426aade4a79991fa4a89f1806d2";
-  try{
-    const pRes=await fetch(`https://api.twelvedata.com/price?symbol=XAU/USD&apikey=${k}`);
-    const p=await pRes.json();
-    if(p.price) cache.price=p.price;
-  }catch(e){}
-  
-  try{
-    const m5Res=await fetch(`https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=5min&outputsize=30&apikey=${k}`);
-    const m5=await m5Res.json();
-    if(m5.values) cache.m5=m5.values.reverse();
-  }catch(e){}
-  
-  try{
-    const m1Res=await fetch(`https://api.twelvedata.com/time_series?symbol=XAU/USD&interval=1min&outputsize=30&apikey=${k}`);
-    const m1=await m1Res.json();
-    if(m1.values) cache.m1=m1.values.reverse();
-  }catch(e){}
-  
-  if(!cache.price){
-    cache.price="2665.42";
-  }
-  cache.t=now;
-  return {statusCode:200,headers:{"Access-Control-Allow-Origin":"*","Content-Type":"application/json"},body:JSON.stringify(cache)};
+let cache = { price: null, m5: [], m1: [], t: 0 };
+
+exports.handler = async () => {
+const headers = {
+"Access-Control-Allow-Origin": "*",
+"Content-Type": "application/json",
+"Cache-Control": "no-store"
+};
+
+try {
+const now = Date.now();
+
+// Reuse cached market data for 15 seconds
+if (cache.t && now - cache.t < 15000 && cache.price) {
+  return {
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ ...cache, cached: true })
+  };
 }
+
+const API_KEY = process.env.TWELVE_DATA_API_KEY;
+
+if (!API_KEY) {
+  return {
+    statusCode: 500,
+    headers,
+    body: JSON.stringify({
+      error: "Missing TWELVE_DATA_API_KEY environment variable"
+    })
+  };
+}
+
+const base = "https://api.twelvedata.com/time_series";
+
+async function getCandles(interval) {
+  const url = `${base}?symbol=XAU/USD&interval=${interval}&outputsize=250&timezone=Africa/Johannesburg&apikey=${API_KEY}`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!response.ok || data.status === "error" || !data.values) {
+    throw new Error(data.message || `Twelve Data ${interval} request failed`);
+  }
+
+  return data.values.map(c => ({
+    time: c.datetime,
+    open: Number(c.open),
+    high: Number(c.high),
+    low: Number(c.low),
+    close: Number(c.close)
+  })).reverse();
+}
+
+const [m1, m5] = await Promise.all([
+  getCandles("1min"),
+  getCandles("5min")
+]);
+
+cache = {
+  price: m1.length ? m1[m1.length - 1].close : null,
+  m1,
+  m5,
+  t: Date.now()
+};
+
+return {
+  statusCode: 200,
+  headers,
+  body: JSON.stringify({ ...cache, cached: false })
+};
+
+} catch (error) {
+return {
+statusCode: 502,
+headers,
+body: JSON.stringify({
+error: "Unable to fetch gold market data",
+details: error.message
+})
+};
+}
+};
